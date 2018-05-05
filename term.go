@@ -77,3 +77,17 @@ func (t *Term) Buffered() (int, error) {
 	err := termios.Tiocoutq(uintptr(t.fd), &n)
 	return n, err
 }
+
+// Fd returns the integer Unix file descriptor
+func (t *Term) Fd() uintptr {
+	if t.fd < 0 {
+		return ^(uintptr(0))
+	} else {
+		// For consistency with os.File the descriptor
+		// is set to blocking mode
+		if err := syscall.SetNonblock(t.fd, false); err != nil {
+			panic(err)
+		}
+		return uintptr(t.fd)
+	}
+}
